@@ -12,88 +12,74 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import static net.enovea.pokemon.PokemonRepository.command;
-import static net.enovea.pokemon.PokemonRepository.getData;
+import static net.enovea.pokemon.PokemonRepository.*;
 
 
 //@SpringBootApplication
 public class BackPokemonApplication {
 
-	private static final ObjectMapper MAPPER = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    private static final ObjectMapper MAPPER = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-	public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
 //		SpringApplication.run(BackPokemonApplication.class, args);
 
-		// Connect to database
-		ge
-	tData();
+        deleteTable();
+        createTable();
 
-		// Connect to API
-		try {
-			URL url = new URL("https://pokeapi.co/api/v2/pokemon-form?limit=898");
+        // Connect to API
+        try {
+            conn
 
-			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-			connection.setRequestMethod("GET");
-			connection.connect();
+            if (responseCode != 200) {
+                throw new RuntimeException("HttpResponseCode " + responseCode);
+            } else {
+                StringBuilder result = new StringBuilder();
+                Scanner scanner = new Scanner(url.openStream());
 
-			int responseCode = connection.getResponseCode();
+                while (scanner.hasNext()) {
+                    result.append(scanner.nextLine());
+                }
+                scanner.close();
 
-			if(responseCode != 200) {
-				throw new RuntimeException("HttpResponseCode " + responseCode);
-			} else {
-				StringBuilder result = new StringBuilder();
-				Scanner scanner = new Scanner(url.openStream());
+                ListPokemon dataObject = MAPPER.readValue(result.toString(), ListPokemon.class);
 
-				while(scanner.hasNext()) {
-					result.append(scanner.nextLine());
-				}
-				scanner.close();
+                ArrayList<Results> resultsList = new ArrayList<>();
+                for (Results result1 : dataObject.getResults()) {
+                    resultsList.add(result1);
 
-				ListPokemon dataObject = MAPPER.readValue(result.toString(), ListPokemon.class);
+                    // Connect to API formPokemon
+                    URL urlForm = new URL(result1.getUrl());
+                    HttpURLConnection connectionForm = (HttpURLConnection) urlForm.openConnection();
+                    connectionForm.setRequestMethod("GET");
+                    connectionForm.connect();
 
-				ArrayList<Results> resultsList = new ArrayList<>();
-				for(Results result1 : dataObject.getResults()) {
-					resultsList.add(result1);
+                    int responseCode1 = connectionForm.getResponseCode();
 
-					// Connect to API formPokemon
-					URL urlForm = new URL(result1.getUrl());
-					HttpURLConnection connectionForm = (HttpURLConnection) urlForm.openConnection();
-					connectionForm.setRequestMethod("GET");
-					connectionForm.connect();
+                    if (responseCode1 != 200) {
+                        throw new RuntimeException("HttpResponseCode " + responseCode1);
+                    } else {
+                        StringBuilder formBuilder = new StringBuilder();
+                        Scanner scanner1 = new Scanner(urlForm.openStream());
 
-					int responseCode1 = connectionForm.getResponseCode();
-
-					if (responseCode1 !=200) {
-						throw new RuntimeException("HttpResponseCode " + responseCode1);
-					} else {
-						StringBuilder formBuilder = new StringBuilder();
-						Scanner scanner1 = new Scanner(urlForm.openStream());
-
-						while(scanner1.hasNext()) {
-							formBuilder.append(scanner1.nextLine());
-						}
-						scanner1.close();
+                        while (scanner1.hasNext()) {
+                            formBuilder.append(scanner1.nextLine());
+                        }
+                        scanner1.close();
 
 
-						FormPokemons pokemons = MAPPER.readValue(formBuilder.toString(), FormPokemons.class);
+                        FormPokemons pokemons = MAPPER.readValue(formBuilder.toString(), FormPokemons.class);
 
-						ArrayList<FormPokemons> formList = new ArrayList<>();
-						formList.add(pokemons);
+                        ArrayList<FormPokemons> formList = new ArrayList<>();
+                        formList.add(pokemons);
 
-						command.executeUpdate("INSERT INTO pokemons (id, name, type1, type2, picture, nickname) VALUES (" +
-								"'" + pokemons.getId() + "', " +
-								"'" + pokemons.getName() + "', " +
-								"'" + pokemons.getTypes()[0].getType().getName() + "', " +
-								"'" + (pokemons.getTypes().length > 1 ? pokemons.getTypes()[1].getType().getName() : "") + "', " +
-								"'" + pokemons.getSprites().getFront_default() + "', " +
-								"'" + pokemons.getName() + "')" +
-								" FOR (id <= 151 INSERT INTO pokemons (generation_id) VALUES (' 1 ')");
-					}
-				}
-			}
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+                        System.out.println(pokemons.getName());
+
+                        insertPokemon(pokemons);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
