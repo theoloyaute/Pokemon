@@ -12,13 +12,12 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import static net.enovea.pokemon.PokemonRepository.command;
+import static net.enovea.pokemon.PokemonRepository.getData;
+
 
 //@SpringBootApplication
 public class BackPokemonApplication {
-
-	private static String url = "jdbc:mysql://localhost:3306/pokedb";
-	private static Connection connection;
-	private static Statement command;
 
 	private static final ObjectMapper MAPPER = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
@@ -26,13 +25,8 @@ public class BackPokemonApplication {
 //		SpringApplication.run(BackPokemonApplication.class, args);
 
 		// Connect to database
-		try {
-			connection = DriverManager.getConnection(url , "root", "");
-			command = connection.createStatement();
-			command.executeQuery("SELECT * FROM pokemons");
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		ge
+	tData();
 
 		// Connect to API
 		try {
@@ -93,8 +87,7 @@ public class BackPokemonApplication {
 								"'" + (pokemons.getTypes().length > 1 ? pokemons.getTypes()[1].getType().getName() : "") + "', " +
 								"'" + pokemons.getSprites().getFront_default() + "', " +
 								"'" + pokemons.getName() + "')" +
-								"");
-
+								" FOR (id <= 151 INSERT INTO pokemons (generation_id) VALUES (' 1 ')");
 					}
 				}
 			}
