@@ -5,5 +5,5 @@ import java.util.List;
 
 public interface PokemonAPI {
     List<Pokemon> getPokemons() throws IOException;
-    List<Generation> getGenerations();
+    List<Generation> getGenerations() throws IOException;
 }

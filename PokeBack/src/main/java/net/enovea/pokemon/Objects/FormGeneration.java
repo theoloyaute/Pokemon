@@ -2,10 +2,12 @@ package net.enovea.pokemon.Objects;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
-public class FormGenerations {
-    private Number id;
+public class FormGeneration {
+    private int id;
     private Results main_regions;
     private String name;
-    private Results[] pokemon_species;
+    private List<Results> pokemon_species;
 }

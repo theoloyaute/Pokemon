@@ -1,23 +1,25 @@
 package net.enovea.pokemon;
 
 import lombok.Data;
+import net.enovea.pokemon.Objects.ListTypes;
+
+import java.util.List;
 
 @Data
 public class Pokemon {
-    private Number id;
+    private int id;
     private String name;
-    private String type1;
-    private String type2;
+    private ListTypes[] types;
     private String picture;
     private String nickname;
-    private Number generationId;
+    private Integer generationId;
 
-    public Pokemon(Number id, String name, String front_default, String name1, String s, Number generationId) {
+    public Pokemon(int id, String name, ListTypes[] types, String picture, String nickname, Integer generationId) {
         this.id = id;
         this.name = name;
-        this.picture = front_default;
-        this.type1 = name1;
-        this.type2 = s;
+        this.types = types;
+        this.picture = picture;
+        this.nickname = nickname;
         this.generationId = generationId;
     }
 }

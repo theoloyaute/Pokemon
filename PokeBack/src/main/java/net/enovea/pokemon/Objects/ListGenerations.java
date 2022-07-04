@@ -6,6 +6,6 @@ import java.util.List;
 
 @Data
 public class ListGenerations {
-    private Number count;
+    private int count;
     private List<Results> results;
 }

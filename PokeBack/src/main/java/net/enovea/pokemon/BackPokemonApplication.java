@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.net.URL;
+import java.sql.SQLException;
 
 //@SpringBootApplication
 public class BackPokemonApplication {
@@ -16,22 +17,30 @@ public class BackPokemonApplication {
         PokemonAPIExternal pokemonAPIExternal = new PokemonAPIExternal();
         PokemonRepository pokemonRepository = new PokemonRepository();
 
-//        pokemonRepository.deleteTable();
-//        pokemonRepository.createTable();
+        pokemonRepository.deleteTable();
+        pokemonRepository.createTable();
 
-//        // Connect to API
         try {
-//            var pokemons = pokemonAPIExternal.getPokemons();
-//            var generations = pokemonAPIExternal.getGenerations();
-//
-//            pokemonRepository.insertPokemon(pokemons);
-//            pokemonRepository.insertGeneration(generations);
-            URL url1 = pokemonAPIExternal.connectAPItoPokemon();
-            URL url2 = pokemonAPIExternal.connectAPItoGeneration();
-            pokemonAPIExternal.getResultsPokemons(url1);
-//            pokemonAPIExternal.getFormPokemons();
-            pokemonAPIExternal.getResultsGenerations(url2);
-            pokemonAPIExternal.getFormGenerations();
+            var pokemons = pokemonAPIExternal.getPokemons();
+            var generations = pokemonAPIExternal.getGenerations();
+            System.out.println(pokemonAPIExternal.getPokemons());
+            pokemons.forEach( pokemon -> {
+                try {
+                    pokemonRepository.insertPokemon(pokemon);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            });
+
+            generations.forEach( generation -> {
+                try {
+                    pokemonRepository.insertGeneration(generation);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            });
+
+
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -6,6 +6,6 @@ import java.util.List;
 
 @Data
 public class ListPokemons {
-    private Number count;
+    private int count;
     private List<Results> results;
 }
