@@ -103,7 +103,7 @@ public class PokemonAPIExternal implements PokemonAPI {
                         return new Generation(
                                 formGeneration.getId(),
                                 formGeneration.getName(),
-                                formGeneration.getMain_regions().getName()
+                                formGeneration.getMain_region().getName()
                         );
                     } catch (IOException e) {
                         throw new RuntimeException(e);

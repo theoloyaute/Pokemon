@@ -2,8 +2,6 @@ package net.enovea.pokemon;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.net.URL;
 import java.sql.SQLException;
 
 //@SpringBootApplication
@@ -23,7 +21,6 @@ public class BackPokemonApplication {
         try {
             var pokemons = pokemonAPIExternal.getPokemons();
             var generations = pokemonAPIExternal.getGenerations();
-            System.out.println(pokemonAPIExternal.getPokemons());
             pokemons.forEach( pokemon -> {
                 try {
                     pokemonRepository.insertPokemon(pokemon);
@@ -39,9 +36,6 @@ public class BackPokemonApplication {
                     e.printStackTrace();
                 }
             });
-
-
-
         } catch (Exception e) {
             e.printStackTrace();
         }

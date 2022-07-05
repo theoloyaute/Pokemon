@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.List;
 
 public class PokemonRepository {
 
@@ -13,19 +12,16 @@ public class PokemonRepository {
     static Statement command;
 
     private static void connectBDD() throws SQLException {
-
         connection = DriverManager.getConnection(url, "root", "");
         command = connection.createStatement();
     }
 
     public void deleteTable() throws SQLException {
-
         connectBDD();
         command.executeUpdate("DROP TABLE pokemons, generations");
     }
 
     public void createTable() throws SQLException {
-
         connectBDD();
         command.executeUpdate(" CREATE TABLE IF NOT EXISTS pokemons (" +
                 "id INT NOT NULL, " +
@@ -34,6 +30,7 @@ public class PokemonRepository {
                 "type2 VARCHAR(255) NULL, " +
                 "picture VARCHAR(255) NULL, " +
                 "nickname VARCHAR(255) NULL, " +
+                "generation_id VARCHAR(255) NULL, " +
                 "PRIMARY KEY (id) " +
                 ")");
 
@@ -46,25 +43,24 @@ public class PokemonRepository {
     }
 
     public void insertPokemon(Pokemon pokemon) throws SQLException {
-
         connectBDD();
-        command.executeUpdate(" INSERT INTO pokemons (id, name, type1, type2, picture, nickname) " +
+        command.executeUpdate(" INSERT INTO pokemons (id, name, type1, type2, picture, nickname, generation_id) " +
                 " VALUES ('" + pokemon.getId() + "', " +
                 "'" + pokemon.getName() + "', " +
                 "'" + pokemon.getTypes()[0].getType().getName() + "', " +
-                "'" + (pokemon.getTypes().length > 1 ? pokemon.getTypes()[1].getType().getName() : null) + "', " +
+                "'" + (pokemon.getTypes().length > 1 ? pokemon.getTypes()[1].getType().getName() : "") + "', " +
                 "'" + pokemon.getPicture() + "', " +
-                "'" + pokemon.getNickname() + "' " +
+                "'" + pokemon.getNickname() + "', " +
+                "'" + pokemon.getGenerationId() + "' " +
                 ")");
     }
 
     public void insertGeneration(Generation generation) throws SQLException {
-
         connectBDD();
-        command.executeUpdate("INSERT INTO generations (id, name, region) " +
+        command.executeUpdate(" INSERT INTO generations (id, name, region) " +
                 " VALUES ('" + generation.getId() + "', " +
                 "'" + generation.getName() + "', " +
-                "'" + generation.getRegion() + "'" +
+                "'" + generation.getRegion() + "' " +
                 ")");
     }
 }
