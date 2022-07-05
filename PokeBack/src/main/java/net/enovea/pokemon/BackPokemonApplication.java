@@ -15,23 +15,23 @@ public class BackPokemonApplication {
         PokemonAPIExternal pokemonAPIExternal = new PokemonAPIExternal();
         PokemonRepository pokemonRepository = new PokemonRepository();
 
+        pokemonRepository.connectBDD();
         pokemonRepository.deleteTable();
-        pokemonRepository.createTable();
 
         try {
-            var pokemons = pokemonAPIExternal.getPokemons();
             var generations = pokemonAPIExternal.getGenerations();
-            pokemons.forEach( pokemon -> {
-                try {
-                    pokemonRepository.insertPokemon(pokemon);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            });
+            var pokemons = pokemonAPIExternal.getPokemons();
 
             generations.forEach( generation -> {
                 try {
                     pokemonRepository.insertGeneration(generation);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            });
+            pokemons.forEach( pokemon -> {
+                try {
+                    pokemonRepository.insertPokemon(pokemon);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }

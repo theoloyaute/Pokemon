@@ -1,6 +1,7 @@
 package net.enovea.pokemon;
 
 import net.enovea.pokemon.Objects.*;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -9,6 +10,7 @@ import java.util.*;
 import static net.enovea.pokemon.BackPokemonApplication.MAPPER;
 
 public class PokemonAPIExternal implements PokemonAPI {
+    private List<Generation> generations;
 
     private <T> T retrieveFromURl(URL url, Class<T> returnType) throws IOException {
         StringBuilder builder = new StringBuilder();
@@ -23,7 +25,7 @@ public class PokemonAPIExternal implements PokemonAPI {
     }
 
     private URL connectAPItoPokemon() throws IOException {
-        URL url = new URL("https://pokeapi.co/api/v2/pokemon-form?limit=28");
+        URL url = new URL("https://pokeapi.co/api/v2/pokemon-form?limit=898");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
         connection.connect();
@@ -48,7 +50,6 @@ public class PokemonAPIExternal implements PokemonAPI {
     @Override
     public List<Pokemon> getPokemons() throws IOException {
         var url = connectAPItoPokemon();
-        var pokemonsGeneration = getPokemonsGeneration(Collections.emptyList());
         return getPokemonsUrl(url)
                 .parallelStream()
                 .map(pokemonURL -> {
@@ -60,8 +61,14 @@ public class PokemonAPIExternal implements PokemonAPI {
                                 formPokemon.getTypes(),
                                 formPokemon.getSprites().getFront_default(),
                                 formPokemon.getName(),
-                                pokemonsGeneration.get(formPokemon.getName())
-                                );
+                                this.generations.stream()
+                                        .filter(generation -> generation.getPokemonsName()
+                                                .stream()
+                                                .anyMatch(pokemonName -> formPokemon.getName().contains(pokemonName)))
+                                        .findFirst()
+                                        .map(Generation::getId)
+                                        .get()
+                        );
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -95,7 +102,7 @@ public class PokemonAPIExternal implements PokemonAPI {
     @Override
     public List<Generation> getGenerations() throws IOException {
         var url = connectAPItoGeneration();
-        return getGenerationsUrl(url)
+        generations = getGenerationsUrl(url)
                 .parallelStream()
                 .map(generationURL -> {
                     try {
@@ -103,28 +110,17 @@ public class PokemonAPIExternal implements PokemonAPI {
                         return new Generation(
                                 formGeneration.getId(),
                                 formGeneration.getName(),
-                                formGeneration.getMain_region().getName()
+                                formGeneration.getMain_region().getName(),
+                                getPokemonsNameFromResult(formGeneration.getPokemon_species())
                         );
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
                 }).toList();
+        return generations;
     }
 
-    private Map<String, Integer> getPokemonsGeneration(List<FormGeneration> formGenerations) {
-        var pokemonsGeneration = new HashMap<String, Integer>();
-
-//        for (FormGeneration generation : formGenerations){
-//            for (Results pokemon_species : generation.getPokemon_species()) {
-//               pokemonsGeneration.put(pokemon_species.getName(), generation.getId());
-//            }
-//        }
-
-        formGenerations.forEach(formGeneration ->
-                        formGeneration.getPokemon_species()
-                                .forEach(pokemon -> pokemonsGeneration.put(pokemon.getName(), formGeneration.getId()))
-                        );
-
-        return pokemonsGeneration;
+    private List<String> getPokemonsNameFromResult(List<Results> results) {
+        return results.stream().map(Results::getName).toList();
     }
 }
