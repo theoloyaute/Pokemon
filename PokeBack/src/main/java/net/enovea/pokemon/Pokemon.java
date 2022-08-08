@@ -3,6 +3,7 @@ package net.enovea.pokemon;
 import lombok.Data;
 import net.enovea.pokemon.Objects.ListTypes;
 
+import java.util.HexFormat;
 import java.util.List;
 
 @Data

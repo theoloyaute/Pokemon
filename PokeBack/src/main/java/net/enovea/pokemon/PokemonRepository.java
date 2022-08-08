@@ -17,8 +17,8 @@ public class PokemonRepository {
     }
 
     public void deleteTable() throws SQLException {
-        command.executeUpdate("DELETE FROM pokemons");
-        command.executeUpdate("DELETE FROM generations");
+        command.executeUpdate("DELETE FROM pokemons; ");
+        command.executeUpdate("DELETE FROM generations; ");
     }
 
     public void insertPokemon(Pokemon pokemon) throws SQLException {

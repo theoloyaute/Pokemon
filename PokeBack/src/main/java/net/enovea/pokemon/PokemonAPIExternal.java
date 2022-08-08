@@ -64,7 +64,9 @@ public class PokemonAPIExternal implements PokemonAPI {
                                 this.generations.stream()
                                         .filter(generation -> generation.getPokemonsName()
                                                 .stream()
-                                                .anyMatch(pokemonName -> formPokemon.getName().contains(pokemonName)))
+                                                .anyMatch(pokemonName -> {
+                                                    return formPokemon.getName().equals(pokemonName) || formPokemon.getName().contains(pokemonName);
+                                                }))
                                         .findFirst()
                                         .map(Generation::getId)
                                         .get()
