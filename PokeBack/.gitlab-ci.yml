@@ -1,0 +1,35 @@
+variables:
+  MYSQL_DATABASE: pokedb
+  MYSQL_USER: root
+  MYSQL_PASSWORD:
+
+  RELEASE_TYPE: "NO"
+
+stages:
+  - compile
+  - test-unit
+  - package
+  - test-integration
+  - publish
+  - cleanup
+
+compile_app:
+  stage: compile
+  script:
+    - npm install
+
+package_app:
+  stage: package
+  script:
+  - mvn clean package
+
+push-registry:
+  stage: publish
+  script:
+  - docker build -t registry .
+  - docker push registry
+
+deploy_app:
+  stage: publish
+  script:
+  - deploy
